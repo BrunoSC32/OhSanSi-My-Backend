@@ -6,13 +6,13 @@ use App\Modules\Enrollments\Models\EnrollmentList;
 use App\Modules\Persons\Models\Person;
 use App\Modules\Enrollments\Models\Enrollment;
 use App\Modules\Persons\Models\OlympistDetail;
-use App\Modules\Enrollments\Models\Pago;
+use App\Modules\Enrollments\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
-class InscripcionNivelesController
+class LevelEnrollmentController
 {
     public function storeOne(Request $request)
     {
@@ -150,44 +150,44 @@ class InscripcionNivelesController
         
         // Validación básica
         $request->validate([
-            'ci' => 'required|exists:persona,ci_persona',
-            'niveles' => 'required|array|min:1',
-            'niveles.*id_nivel' => 'integer|exists:nivel_categoria,id_nivel',
-            'niveles.*.ci_tutor_academico' => 'nullable|exists:persona,ci_persona',
-            'ci_responsable' => 'required|exists:persona,ci_persona',
+            'ci' => 'required|exists:person,person_ci',
+            'levels' => 'required|array|min:1',
+            'levels.*levelid' => 'integer|exists:category_level,level_id',
+            'levels.*.ci_tutor_academico' => 'nullable|exists:person,person_ci',
+            'responsible_ci' => 'required|exists:person,person_ci',
         ]);
-        $responsable = Persona::where('ci_persona', $request->ci_responsable)
-        ->first(['nombres', 'apellidos', 'ci_persona']);
+        $responsible = Person::where('person_ci', $request->responsible_ci)
+        ->first(['names', 'surnames', 'person_ci']);
         try {
             DB::beginTransaction();
-            $olimpista = DetalleOlimpista::firstOrCreate(
-                ['ci_olimpista' => $request->ci]
+            $olympist = OlympistDetail::firstOrCreate(
+                ['olympist_ci' => $request->ci]
             );
             // Crear inscripciones para cada nivel
-            $lista = ListaInscripcion::create([
-                'id_olimpiada' => $olimpista -> id_olimpiada,
-                'ci_responsable_inscripcion' => $request->ci_responsable,
-                'estado' => 'PENDIENTE',
-                'fecha_creacion_lista' => now()
+            $list = EnrollmentList::create([
+                'olympiad_id' => $olympist -> olympiad_id,
+                'enrollment_responsible_ci' => $request->responsible_ci,
+                'status' => 'PENDIENTE',
+                'list_creation_date' => now()
             ]);
-            $inscripciones = [];
-            foreach ($request->niveles as $nivelData) {
-                $inscripciones[] = Inscripcion::create([
-                    'id_detalle_olimpista' => $olimpista->id_detalle_olimpista,
-                    'ci_tutor_academico' => $nivelData['ci_tutor_academico'] ?? null,
-                    'id_lista' => $lista->id_lista,
-                    'id_nivel' => $nivelData['id_nivel'],
+            $enrollments = [];
+            foreach ($request->levels as $dataLevel) {
+                $enrollments[] = Enrollment::create([
+                    'olympist_detail_id' => $olympist->olympist_detail_id,
+                    'academic_tutor_ci' => $dataLevel['academic_tutor_ci'] ?? null,
+                    'list_id' => $list->list_id,
+                    'level_id' => $dataLevel['level_id'],
                 ]);
             }
 
         DB::commit();
         return response()->json([
             'message' => 'Inscripciones registradas correctamente.',
-            'count' => count($inscripciones),
-            'ci_responsable' => $request->ci_responsable,
-            'nombres' => $responsable->nombres,
-            'apellidos' => $responsable->apellidos,
-            'data' => $inscripciones
+            'count' => count($enrollments),
+            'responsible_id' => $request->responsible_ci,
+            'names' => $responsible->names,
+            'surnames' => $responsible->surnames,
+            'data' => $enrollments
         ], 201);    
         } catch (\Throwable $e) {
             DB::rollBack();

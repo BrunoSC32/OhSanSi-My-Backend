@@ -17,7 +17,7 @@ use App\Modules\Olympiads\Controllers\SchoolController;
 use App\Modules\Persons\Controllers\OlympistController;
 use App\Modules\Olympiads\Controllers\OlympiadController;
 use App\Modules\Enrollments\Controllers\VerifyEnrollmentController;
-use App\Modules\Olympiads\Controllers\InscripcionNivelesController;
+use App\Modules\Enrollments\Controllers\LevelEnrollmentController;
 use App\Modules\Enrollments\Controllers\EnrollmentListController;
 use App\Modules\Enrollments\Controllers\ExcelImportController;
 use App\Modules\Enrollments\Controllers\DatosExcelController;
@@ -57,7 +57,7 @@ Route::prefix('departaments')->middleware('throttle:100,1')->group(function () {
 });
 
 Route::prefix('enrollments')->middleware('throttle:100,1')->group(function () {
-    Route::post('/with-tutor', [InscripcionNivelesController::class, 'storeWithTutor']); //si
+    Route::post('/with-tutor', [LevelEnrollmentController::class, 'storeWithTutor']); //si
     // Route::post('/one', [InscripcionNivelesController::class, 'storeOne']);  //no se usa creo
     Route::get('/participants/{id}',[EnrollmentListController::class, 'getById']); //si, ta posi
     Route::get('/pending/{ci}', [EnrollmentListController::class, 'pendingPaymentlists']); //si, falta datos para probar
