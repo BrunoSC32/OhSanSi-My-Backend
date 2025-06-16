@@ -208,7 +208,7 @@ class CategoryLevelController
         );
     }
 
-    public function getByNivelesById($id)
+    public function getLevelsById($id)
     {
         $olympiad = Olympiad::find($id);
         if (!$olympiad) {
@@ -220,7 +220,7 @@ class CategoryLevelController
         $levelsWithArea = OlympiadAreaLevel::where('olympiad_id', $id)
             ->pluck('level_id')
             ->toArray();
-        $availableLevels = NivelGrado::with('nivel')
+        $availableLevels = GradeLevel::with('nivel')
             ->where(function($query) use ($id, $levelsWithArea) {
                 $query->where('olympiad_id', $id)
                     ->whereNotIn('level_id', $levelsWithArea);

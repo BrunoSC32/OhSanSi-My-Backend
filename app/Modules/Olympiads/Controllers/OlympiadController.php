@@ -13,39 +13,15 @@ use Illuminate\Support\Facades\Log;
 
 class OlympiadController
 {
-    public function verificarOlimpiadaAbierta()
-    {
-        $hoy = Carbon::now()->toDateString();
-
-        $olimpiada = Olimpiada::where('fecha_inicio', '<=', $hoy)
-            ->where('fecha_fin', '>=', $hoy)
-            ->first();
-
-        if ($olimpiada) {
-            return response()->json([
-                'abierta' => true,
-                'olimpiada' => $olimpiada
-            ], 200);
-        } else {
-            return response()->json([
-                'abierta' => false,
-                'message' => 'No hay olimpiadas activas en este momento.'
-            ], 404);
-        }
-    }
     public function getMaxCategories(Request $request)
     {
-        $request->validate([
-            'date' => 'required|date'
-        ]);
-
-        $fecha = $request->input('date');
-
-        $olimpiada = Olimpiada::where('fecha_inicio', '<=', $fecha)
-            ->where('fecha_fin', '>=', $fecha)
+        $today = Carbon::now();
+        $format = $today->format('Y-m-d');
+        $olympiad = Olympiad::where('start_date', '<=', $format)
+            ->where('end_date', '>=', $format)
             ->first();
 
-        if (!$olimpiada) {
+        if (!$olympiad) {
             return response()->json([
                 'success' => false,
                 'message' => 'No se encontró una olimpiada activa en esa fecha.'
@@ -54,119 +30,66 @@ class OlympiadController
 
         return response()->json([
             'success' => true,
-            'fecha' => $fecha,
-            'id_olimpiada' => $olimpiada->id_olimpiada,
-            'max_categorias_olimpista' => $olimpiada->max_categorias_olimpista
+            'date' => $format,
+            'olympiad_id' => $olympiad->olympiad_id,
+            'max_categories_per_olympist' => $olympiad->max_categories_per_olympist
         ]);
     }
-    public function getAreasConNiveles($idOlimpiada)
-    {
-        \Log::info('Iniciando getAreasConNiveles', ['idOlimpiada' => $idOlimpiada]);
-        try {
-            // Obtener la olimpiada con su gestión
-            $olimpiada = Olimpiada::findOrFail($idOlimpiada);
-            
-            // Obtener todas las relaciones área-nivel para esta olimpiada
-            $areasConNiveles = NivelAreaOlimpiada::with([
-                'area:id_area,nombre',
-                'nivel:id_nivel,nombre'
-            ])
-            ->where('id_olimpiada', $idOlimpiada)
-            ->get()
-            ->groupBy('id_area'); // Agrupar por área
 
-            // Formatear la respuesta
+    public function getAreasWithLevels($id)
+    {
+        try {
+            $olympiad = Olympiad::findOrFail($id);
+            $areasWithLevels = OlympiadAreaLevel::with([
+                'area:area_id,area_name',
+                'level:level_id,level_name'
+            ])
+            ->where('olympiad_id', $id)
+            ->get()
+            ->groupBy('area_id');
             $response = [
-                'gestion' => $olimpiada->gestion,
-                'areas' => $areasConNiveles->map(function ($items, $idArea) {
+                'year' => $olympiad->year,
+                'areas' => $areasWithLevels->map(function ($items, $areaId) {
                     return [
-                        'id_area' => (int) $idArea,
-                        'nombre_area' => $items->first()->area->nombre,
-                        'niveles' => $items->map(function ($item) {
+                        'area_id' => (int) $areaId,
+                        'area_name' => $items->first()->area->area_name,
+                        'levels' => $items->map(function ($item) {
                             return [
-                                'id_nivel' => $item->id_nivel,
-                                'nombre_nivel' => trim($item->nivel->nombre),
+                                'level_id' => $item->level_id,
+                                'level_name' => trim($item->level->level_name),
                             ];
-                        })->unique('id_nivel')->values()
+                        })->unique('level_id')->values()
                     ];
                 })->values()
             ];
-            
-
             return response()->json([
                 'success' => true,
                 'data' => $response
             ]);
-
         } catch (\Exception $e) {
-            \Log::error('Error en getAreasConNiveles', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             throw $e;
         }
     }
 
-    public function getAreasYNiveles($id_olimpiada)
+    public function getStatistics($olympiad_id)
     {
-        $olimpiada = Olimpiada::with(['nivelesAreas.area', 'nivelesAreas.nivel'])
-            ->find($id_olimpiada);
-
-        if (!$olimpiada || $olimpiada->nivelesAreas->isEmpty()) {
-            return response()->json([
-                'message' => 'No hay áreas asociadas a esta olimpiada.',
-                'data' => []
-            ], 404);
-        }
-
-        $agrupado = [];
-
-        foreach ($olimpiada->nivelesAreas as $relacion) {
-            $area = $relacion->area->nombre ?? null;
-            $nivel = $relacion->nivel->nombre ?? null;
-
-            if (!$area || !$nivel) continue;
-
-            if (!isset($agrupado[$area])) {
-                $agrupado[$area] = [
-                    'nombre_area' => $area,
-                    'niveles' => []
-                ];
-            }
-
-            $agrupado[$area]['niveles'][] = [
-                'nombre_nivel' => $nivel
-            ];
-        }
-
-        return response()->json(array_values($agrupado), 200);
-    }
-
-    public function getStatistics($id_olimpiada)
-    {
-        $total_areas = NivelAreaOlimpiada::where('id_olimpiada', $id_olimpiada)
-            ->distinct('id_area')
-            ->count('id_area');
-
-        $total_niveles = NivelAreaOlimpiada::where('id_olimpiada', $id_olimpiada)
-            ->distinct('id_nivel')
-            ->count('id_nivel');
-
-        
-        // PASO 1: Buscar los id_lista con estado 'PAGADO'
-        $listas_pagadas = ListaInscripcion::where('id_olimpiada', $id_olimpiada)
-            ->where('estado', 'PAGADO')
-            ->pluck('id_lista');
-
-        // PASO 2: Cuenta los id_detalle_olimpista únicos en inscripcion para esas listas
-        $total_inscritos = Inscripcion::whereIn('id_lista', $listas_pagadas)
-            ->distinct('id_detalle_olimpista')
-            ->count('id_detalle_olimpista');
+        $total_areas = OlympiadAreaLevel::where('olympiad_id', $olympiad_id)
+            ->distinct('area_id')
+            ->count('area_id');
+        $total_levels = OlympiadAreaLevel::where('olympiad_id', $olympiad_id)
+            ->distinct('level_id')
+            ->count('level_id');
+        $payed_lists = EnrollmentList::where('olympiad_id', $olympiad_id)
+            ->where('status', 'PAGADO')
+            ->pluck('list_id');
+        $total_enrolled = Enrollment::whereIn('id_lista', $payed_lists)
+            ->distinct('olympist_detail_id')
+            ->count('olympist_detail_id');
 
         return [
             'total_areas' => $total_areas,
-            'total_niveles' => $total_niveles,
-            'total_inscritos' => $total_inscritos,
+            'total_niveles' => $total_levels,
+            'total_inscritos' => $total_enrolled,
         ];
     }
 

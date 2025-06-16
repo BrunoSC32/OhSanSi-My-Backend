@@ -10,8 +10,8 @@ use App\Modules\Olympiads\Controllers\InscripcionAreaController;
 use App\Modules\Persons\Controllers\TutorController;
 use App\Modules\Olympiads\Controllers\OlympiadRegistrationController;
 use App\Modules\Olympiads\Controllers\DepartamentController;
-use App\Modules\Olympiads\Controllers\ProvinciaController;
-use App\Modules\Olympiads\Controllers\OlimpiadaGestionController;
+use App\Modules\Olympiads\Controllers\ProvinceController;
+use App\Modules\Olympiads\Controllers\OlympiadManagmentController;
 use App\Modules\Olympiads\Controllers\AreasFiltroController;
 use App\Modules\Olympiads\Controllers\SchoolController;
 use App\Modules\Persons\Controllers\OlympistController;
@@ -48,8 +48,8 @@ Route::prefix('person')->middleware('throttle:100,1')->group(function () {
 });
 
 Route::prefix('provinces')->middleware('throttle:100,1')->group(function () {
-    Route::get('/', [ProvinciaController::class, 'index']); //si
-    Route::get('/{id}', [ProvinciaController::class, 'porDepartamento']);//si
+    Route::get('/', [ProvinceController::class, 'index']); //si
+    Route::get('/{id}', [ProvinceController::class, 'byDepartament']);//si
 });
 
 Route::prefix('departaments')->middleware('throttle:100,1')->group(function () {
@@ -81,15 +81,15 @@ Route::get('/payment/{ci}', [PaymentConsultationController::class, 'verificarPor
 
 Route::prefix('olympiads')->middleware('throttle:100,1')->group(function () {
     Route::post('/', [OlympiadRegistrationController::class, 'store']); //si
-    Route::get('/', [OlimpiadaGestionController::class, 'index']); //si
-    Route::get('/now', [OlimpiadaGestionController::class, 'index2']); //si
+    Route::get('/', [OlympiadManagmentController::class, 'index']); //si
+    Route::get('/now', [OlympiadManagmentController::class, 'now']); //si
     Route::get('/max-categories', [OlympiadController::class, 'getMaxCategories']); //si // falta acabar
     Route::get('/{id}/max-categories', [OlympiadController::class, 'getMaxCategoriesById']); //si
-    Route::get('/{id}/levels-areas', [OlympiadController::class, 'getAreasConNiveles']); //si
+    Route::get('/{id}/levels-areas', [OlympiadController::class, 'getAreasWithLevels']); //si
     Route::get('/{id}/areas', [AreaController::class, 'areasByOlympiad']); //si
-    Route::get('/{id}/management', [OlimpiadaGestionController::class, 'show']); //si 
+    Route::get('/{year}/management', [OlympiadManagmentController::class, 'show']); //si 
+    //Route::get('/{year}', [OlympiadManagmentController::class, 'show']); //si lo mismo?
     Route::get('/{year}/statistics', [OlympiadController::class, 'getStatistics']); //si
-    Route::get('/{year}', [OlimpiadaGestionController::class, 'show']); //si
 });
 Route::prefix('excel')->middleware('throttle:100,1')->group(function () {
     Route::post('/data', [ExcelImportController::class, 'import']); //si, ya ta posi
@@ -117,5 +117,5 @@ Route::post('/tutors', [TutorController::class, 'store']); //si, ta posi
 Route::get('/tutors/{ci}',[TutorController::class,'buscarPorCi']); //si, ta posi
 Route::post('/payment/verification', [PagoValidacionController::class, 'verificar']);
 
-Route::get('/levels-areas/{id}', [CategoryLevelController::class, 'getByNivelesById']);//si
+Route::get('/levels-areas/{id}', [CategoryLevelController::class, 'getLevelsById']);//si
 Route::post('/login', [AuthController::class, 'login']);
