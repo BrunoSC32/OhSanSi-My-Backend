@@ -24,10 +24,10 @@ class AreaController
      */
     public function areasByOlympiad($id)
     {
-        $areas = NivelAreaOlimpiada::where('olympiad_id', $id)
+        $areas = OlympiadAreaLevel::where('olympiad_id', $id)
             ->join('area', 'olympiad_area_level.area_id', '=', 'area.area_id')
-            ->select('area.area_id', 'area.name')
-            ->groupBy('area.area_id', 'area.name')
+            ->select('area.area_id', 'area.area_name')
+            ->groupBy('area.area_id', 'area.area_name')
             ->get();
 
         if ($areas->isEmpty()) {
@@ -49,7 +49,7 @@ class AreaController
     public function store(StoreAreaRequest $request)
     {
         Area::create([
-            'name' => $request->name,
+            'area_name' => $request->name,
         ]);
 
         return response()->json([

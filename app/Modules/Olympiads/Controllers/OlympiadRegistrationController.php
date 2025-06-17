@@ -10,29 +10,29 @@ class OlympiadRegistrationController
 {
     public function index()
     {
-        $olimpiadas = Olimpiada::all();
-        return response()->json($olimpiadas, 200);
+        $olympiads = Olympiad::all();
+        return response()->json($olympiads, 200);
     }
 
     public function store(Request $request)
     {
         try {
             $validated = $request->validate([
-                'gestion' => 'required|integer',
-                'costo' => 'required|numeric',
-                'fecha_inicio' => 'required|date',
-                'fecha_fin' => 'required|date',
-                'max_categorias_olimpista' => 'required|integer',
-                'nombre_olimpiada' => 'required|string|max:255',
+                'year' => 'required|integer',
+                'cost' => 'required|numeric',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date',
+                'max_categories_per_olympist' => 'required|integer',
+                'olympiad_name' => 'required|string|max:255',
             ]);
 
-            $validated['creado_en'] = \Carbon\Carbon::now('UTC');
+            $validated['created_in'] = \Carbon\Carbon::now('UTC');
 
-            $olimpiada = Olimpiada::create($validated);
+            $olympiad = Olympiad::create($validated);
 
             return response()->json([
                 'message' => 'Olimpiada creada exitosamente',
-                'olimpiada' => $olimpiada
+                'olympiad' => $olympiad
             ], 201);
 
         } catch (\Exception $e) {
