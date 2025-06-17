@@ -49,7 +49,7 @@ Route::prefix('person')->middleware('throttle:100,1')->group(function () {
 
 Route::prefix('provinces')->middleware('throttle:100,1')->group(function () {
     Route::get('/', [ProvinceController::class, 'index']); //si
-    Route::get('/{id}', [ProvinceController::class, 'byDepartament']);//si
+    Route::get('/{id}', [ProvinceController::class, 'byDepartment']);//si
 });
 
 Route::prefix('departments')->middleware('throttle:100,1')->group(function () {

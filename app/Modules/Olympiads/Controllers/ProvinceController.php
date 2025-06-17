@@ -12,9 +12,9 @@ class ProvinceController
         return response()->json($provinces, 200);
     }
 
-    public function porDepartamento($id)
+    public function byDepartment($id)
     {
-        $provinces = Province::where('departament_id', $id)->get();
+        $provinces = Province::where('department_id', $id)->get();
 
         if ($provinces->isEmpty()) {
             return response()->json([
