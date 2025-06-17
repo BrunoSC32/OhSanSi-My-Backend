@@ -9,7 +9,7 @@ use App\Modules\Olympiads\Controllers\GradeController;
 use App\Modules\Olympiads\Controllers\InscripcionAreaController;
 use App\Modules\Persons\Controllers\TutorController;
 use App\Modules\Olympiads\Controllers\OlympiadRegistrationController;
-use App\Modules\Olympiads\Controllers\DepartamentController;
+use App\Modules\Olympiads\Controllers\DepartmentController;
 use App\Modules\Olympiads\Controllers\ProvinciaController;
 use App\Modules\Olympiads\Controllers\OlimpiadaGestionController;
 use App\Modules\Olympiads\Controllers\AreasFiltroController;
@@ -21,7 +21,7 @@ use App\Modules\Enrollments\Controllers\LevelEnrollmentController;
 use App\Modules\Enrollments\Controllers\EnrollmentListController;
 use App\Modules\Enrollments\Controllers\ExcelImportController;
 use App\Modules\Enrollments\Controllers\DatosExcelController;
-use App\Modules\Persons\Controllers\PersonaController;
+use App\Modules\Persons\Controllers\PersonaContrcdoller;
 use App\Modules\Enrollments\Controllers\PaymentSlipController;
 use App\Modules\Enrollments\Controllers\TestPreprocessorController;
 use App\Modules\Enrollments\Controllers\PaymentConsultationController;
@@ -52,8 +52,8 @@ Route::prefix('provinces')->middleware('throttle:100,1')->group(function () {
     Route::get('/{id}', [ProvinciaController::class, 'porDepartamento']);//si
 });
 
-Route::prefix('departaments')->middleware('throttle:100,1')->group(function () {
-    Route::get('/', [DepartamentController::class, 'index']);  //si
+Route::prefix('departments')->middleware('throttle:100,1')->group(function () {
+    Route::get('/', [DepartmentController::class, 'index']);  //si
 });
 
 Route::prefix('enrollments')->middleware('throttle:100,1')->group(function () {
