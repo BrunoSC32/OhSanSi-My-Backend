@@ -88,8 +88,8 @@ class OlympiadController
 
         return [
             'total_areas' => $total_areas,
-            'total_niveles' => $total_levels,
-            'total_inscritos' => $total_enrolled,
+            'total_levels' => $total_levels,
+            'total_enrollments' => $total_enrolled,
         ];
     }
 

@@ -4,7 +4,7 @@ namespace App\Modules\Olympiads\Controllers;
 
 use App\Modules\Olympiads\Models\Area;
 use App\Modules\Olympiads\Requests\StoreAreaRequest;
-use Illuminate\Http\Request\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Olympiads\Models\OlympiadAreaLevel;
 
@@ -46,16 +46,32 @@ class AreaController
     /**
      * Registrar una nueva área
      */
-    public function store(StoreAreaRequest $request)
+    public function store(Request $request)
     {
-        Area::create([
-            'area_name' => $request->name,
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:50|unique:area,area_name'
+            ]);
 
-        return response()->json([
-            'message' => 'Área registrada exitosamente',
-            'status' => 201
-        ], 201);
+            $area = Area::create([
+                'area_name' => trim($validated['name'])
+            ]);
+
+            return response()->json([
+                'message' => 'Area creada correctamente.',
+                'level' => $area
+            ], 201);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'error' => $e->validator->errors()->first()
+            ], 422);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Ocurrió un error inesperado.',
+                'detalle' => $e->getMessage()
+            ], 500);
+        }
     }
 
 }

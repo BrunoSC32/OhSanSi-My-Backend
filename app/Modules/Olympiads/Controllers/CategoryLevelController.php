@@ -33,7 +33,7 @@ class CategoryLevelController
             ]);
 
             $level = CategoryLevel::create([
-                'name' => trim($validated['name'])
+                'level_name' => trim($validated['name'])
             ]);
 
             return response()->json([
@@ -78,13 +78,13 @@ class CategoryLevelController
     
     public function associateLevelsWithArea(Request $request)
     {
-        $data = $request->validate([
-            'olympiad_id' => 'required|integer|exists:olympiad,olympiad_id',
-            'area_id' => 'required|integer|exists:area,area_id',
-            'level_id.' => 'required|integer|exists:category_level,level_id',
-        ]);
         DB::beginTransaction();
         try {
+            $data = $request->validate([
+                'olympiad_id' => 'required|integer|exists:olympiad,olympiad_id',
+                'area_id' => 'required|integer|exists:area,area_id',
+                'level_id' => 'required|integer|exists:category_level,level_id',
+            ]);
             $exist = OlympiadAreaLevel::where([
                 'olympiad_id' => $request->olympiad_id,
                 'area_id' => $request->area_id,
@@ -194,11 +194,11 @@ class CategoryLevelController
             $allGrades = $olympiadGrades->merge($gradesNull)->unique('grado_id');
                 return [
                 'level_id' => $level->level_id,
-                'level_name' => $level->name,
+                'level_name' => $level->level_name,
                 'grades' => $allGrades->map(function ($grade) {
                     return [
                         'grade_id' => $grade->grade_id,
-                        'grade_name' => $grade->name,
+                        'grade_name' => $grade->grade_name,
                     ];
                 })->values()
             ];
@@ -233,7 +233,7 @@ class CategoryLevelController
             ->map(function ($item) {
                 return [
                     'level_id' => $item->level_id,
-                    'name' => $item->nivel->name,
+                    'name' => $item->level->level_name,
                 ];
             })
             ->values();
