@@ -18,35 +18,13 @@ use App\Services\Excel\OlympistProcessor;
 use App\Services\Excel\TeacherProcessor;
 use App\Services\Excel\EnrollmentProcessor;
 
-class DatosExcelController
+class ExcelDataController
 {
     public function cleanDates(Request $request)
     {
         $datos = $request->input('data');
         $ci_responsible = $request->input('enrollment_responsible_ci');
-        // $columnMap = [
-        //     0 => 'Nombre estudiante',
-        //     1 => 'Apellido estudiante',
-        //     2 => 'CI estudiante',
-        //     3 => 'RU',
-        //     4 => 'Correo estudiante',
-        //     5 => 'Departamento',
-        //     6 => 'Provincia',
-        //     7 => 'Unidad Educativa',
-        //     8 => 'Grado',
-        //     9 => 'Nombre tutor',
-        //     10 => 'Apellido tutor',
-        //     11 => 'Celular tutor',
-        //     12 => 'CI tutor',
-        //     13 => 'Correo tutor',
-        //     14 => 'Área',
-        //     15 => 'Nivel',
-        //     16 => 'Nombre profesor',
-        //     17 => 'Apellido profesor',
-        //     18 => 'Celular profesor',
-        //     19 => 'CI profesor',
-        //     20 => 'Correo profesor',
-        // ];
+        
         
         if (!is_array($datos)) {
             return response()->json(['error' => 'El archivo no contiene datos válidos.'], 400);
@@ -61,8 +39,8 @@ class DatosExcelController
         }
         $sanitizedData = [];
         $tutorsData = [];
-        $olimpistasData = [];
-        $profesorData = [];
+        $dataOlympists = [];
+        $dataTeachers = [];
         $areasData = [];
 
         $finalResponse = [
@@ -78,8 +56,8 @@ class DatosExcelController
             
             $row['index'] = $index;
             $tutorsData[$row[11]] = TutorResolver::extractTutorData($row);
-            $olimpistasData[$row[2]] = OlympistResolver::extractOlympistData($row, $finalResponse);
-            $profesorData[$row[19]] = TeacherResolver::extractProfesorData($row,);
+            $dataOlympists[$row[2]] = OlympistResolver::extractOlympistData($row, $finalResponse);
+            $dataTeachers[$row[19]] = TeacherResolver::extractProfesorData($row,);
             // $areasData[] = AreaResolver::extractAreaData($row);
 
             
@@ -91,8 +69,8 @@ class DatosExcelController
 
             // Guardar primero tutores, profesores y olimpistas
             TutorProcessor::save($tutorsData, $finalResponse);
-            TeacherProcessor::save($profesorData, $finalResponse);
-            OlympistProcessor::save($olimpistasData, $finalResponse);
+            TeacherProcessor::save($dataTeachers, $finalResponse);
+            OlympistProcessor::save($dataOlympists, $finalResponse);
 
             
 

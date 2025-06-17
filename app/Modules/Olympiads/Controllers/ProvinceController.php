@@ -8,13 +8,13 @@ class ProvinceController
 {
     public function index()
     {
-        $provinces = Provincia::select('province_id', 'province_name')->get();
+        $provinces = Province::select('province_id', 'province_name')->get();
         return response()->json($provinces, 200);
     }
 
     public function porDepartamento($id)
     {
-        $provinces = Provincia::where('departament_id', $id)->get();
+        $provinces = Province::where('departament_id', $id)->get();
 
         if ($provinces->isEmpty()) {
             return response()->json([

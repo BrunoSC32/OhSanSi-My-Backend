@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Olympiads\Controllers\CategoryLevelController;
 use App\Modules\Olympiads\Controllers\AreaController;
 use App\Modules\Olympiads\Controllers\GradeController;
-use App\Modules\Olympiads\Controllers\InscripcionAreaController;
+// use App\Modules\Olympiads\Controllers\InscripcionAreaController;
 use App\Modules\Persons\Controllers\TutorController;
 use App\Modules\Olympiads\Controllers\OlympiadRegistrationController;
 use App\Modules\Olympiads\Controllers\DepartmentController;
-use App\Modules\Olympiads\Controllers\ProvinciaController;
+use App\Modules\Olympiads\Controllers\ProvinceController;
 use App\Modules\Olympiads\Controllers\OlympiadManagmentController;
-use App\Modules\Olympiads\Controllers\AreasFiltroController;
+// use App\Modules\Olympiads\Controllers\AreasFiltroController;
 use App\Modules\Olympiads\Controllers\SchoolController;
 use App\Modules\Persons\Controllers\OlympistController;
 use App\Modules\Olympiads\Controllers\OlympiadController;
@@ -20,8 +20,8 @@ use App\Modules\Enrollments\Controllers\VerifyEnrollmentController;
 use App\Modules\Enrollments\Controllers\LevelEnrollmentController;
 use App\Modules\Enrollments\Controllers\EnrollmentListController;
 use App\Modules\Enrollments\Controllers\ExcelImportController;
-use App\Modules\Enrollments\Controllers\DatosExcelController;
-use App\Modules\Persons\Controllers\PersonaContrcdoller;
+use App\Modules\Enrollments\Controllers\ExcelDataController;
+use App\Modules\Persons\Controllers\PersonController;
 use App\Modules\Enrollments\Controllers\PaymentSlipController;
 use App\Modules\Enrollments\Controllers\TestPreprocessorController;
 use App\Modules\Enrollments\Controllers\PaymentConsultationController;
@@ -93,7 +93,7 @@ Route::prefix('olympiads')->middleware('throttle:100,1')->group(function () {
 });
 Route::prefix('excel')->middleware('throttle:100,1')->group(function () {
     Route::post('/data', [ExcelImportController::class, 'import']); //si, ya ta posi
-    Route::post('/registration', [DatosExcelController::class, 'cleanDates']); //si, ya ta posi
+    Route::post('/registration', [ExcelDataController::class, 'cleanDates']); //si, ya ta posi
 });
 Route::prefix('levels')->middleware('throttle:100,1')->group(function () {
     Route::get('/', [CategoryLevelController::class, 'index']); //si
