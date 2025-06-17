@@ -11,7 +11,7 @@ use App\Modules\Persons\Controllers\TutorController;
 use App\Modules\Olympiads\Controllers\OlympiadRegistrationController;
 use App\Modules\Olympiads\Controllers\DepartmentController;
 use App\Modules\Olympiads\Controllers\ProvinciaController;
-use App\Modules\Olympiads\Controllers\OlimpiadaGestionController;
+use App\Modules\Olympiads\Controllers\OlympiadManagmentController;
 use App\Modules\Olympiads\Controllers\AreasFiltroController;
 use App\Modules\Olympiads\Controllers\SchoolController;
 use App\Modules\Persons\Controllers\OlympistController;

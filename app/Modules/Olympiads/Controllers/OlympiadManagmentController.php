@@ -27,7 +27,7 @@ class OlympiadManagmentController
 
         if ($olympiad->isEmpty()) {
             return response()->json([
-                'message' => "No se encontró una Olympiad para la gestión $year."
+                'message' => "No se encontró una Olimpiada para la gestión $year."
             ], 404);
         }
 
