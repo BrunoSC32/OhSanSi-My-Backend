@@ -29,7 +29,7 @@ class CategoryLevelController
     {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|max:50|unique:category_level,name'
+                'name' => 'required|string|max:50|unique:category_level,level_name'
             ]);
 
             $level = CategoryLevel::create([
@@ -55,7 +55,7 @@ class CategoryLevelController
 
     public function getByOlympiad($id)
     {
-        $olympiad = Olimpiada::find($id);
+        $olympiad = Olympiad::find($id);
         if (!$olympiad) {
             return response()->json([
                 'success' => false,
@@ -141,7 +141,7 @@ class CategoryLevelController
         foreach ($grades as $grade) {
             $levelGrade = LevelGrade::create([
                 'level_id' => $request->level_id,
-                'grade_id' => $grado->grade_id,
+                'grade_id' => $grade->grade_id,
                 'olympiad_id' => $request->olympiad_id
             ]);
             $createdAssociations++;
@@ -166,7 +166,7 @@ class CategoryLevelController
 
     public function getById($id)
     {
-        $olympiad = olympiad::find($id);
+        $olympiad = Olympiad::find($id);
         if (!$olympiad) {
             return response()->json([
                 'success' => false,
@@ -197,7 +197,7 @@ class CategoryLevelController
                 'level_name' => $level->name,
                 'grades' => $allGrades->map(function ($grade) {
                     return [
-                        'grade_id' => $grade->grado_id,
+                        'grade_id' => $grade->grade_id,
                         'grade_name' => $grade->name,
                     ];
                 })->values()
@@ -220,7 +220,7 @@ class CategoryLevelController
         $levelsWithArea = OlympiadAreaLevel::where('olympiad_id', $id)
             ->pluck('level_id')
             ->toArray();
-        $availableLevels = GradeLevel::with('nivel')
+        $availableLevels = LevelGrade::with('level')
             ->where(function($query) use ($id, $levelsWithArea) {
                 $query->where('olympiad_id', $id)
                     ->whereNotIn('level_id', $levelsWithArea);
@@ -240,7 +240,7 @@ class CategoryLevelController
         return response()->json([
             'success' => true,
             'message' => 'Niveles disponibles sin área asignada',
-            'niveles' => $availableLevels,
+            'levels' => $availableLevels,
         ]);
     }
 }
