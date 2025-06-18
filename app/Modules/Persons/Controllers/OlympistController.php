@@ -78,22 +78,22 @@ class OlympistController
         if (!$person) {
             return response()->json(['message' => 'No encontrado'], 404);
         }
+        $data = $person->toArray();
 
         $response = [
-            'person_ci' => $person->person_ci,
-            'names' => $person->names,
-            'surnames' => $person->surnames,
-            'birthdate' => $person->birthdate,
-            'email' => $person->email,
-            'phone' => $person->phone,
-            'guardian_legal_ci' => $person->olympistDetail->guardian_legal_ci ?? null,
-            'department_id' => $person->olympistDetail->school->province->department_id ?? null,
-            'province_id' => $person->olympistDetail->school->province_id ?? null,
-            'school_id' => $person->olympistDetail->school ?? null,
-            'grade_id' => $person->olympistDetail->grade_id ?? null,
-            'olympiad_id' => $person->olympistDetail->olympiad_id ?? null,
+            'person_ci' => $data['person_ci'],
+            'names' => $data['names'],
+            'surnames' => $data['surnames'],
+            'birthdate' => $data['birthdate'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'guardian_legal_ci' => $data['olympist_detail']['guardian_legal_ci'] ?? null,
+            'department_id' => $data['olympist_detail']['school']['province']['department']['department_id'] ?? null,
+            'province_id' => $data['olympist_detail']['school']['province']['province_id'] ?? null,
+            'school_id' => $data['olympist_detail']['school']['school_id'] ?? null,
+            'grade_id' => $data['olympist_detail']['grade_id'] ?? null,
+            'olympiad_id' => $data['olympist_detail']['olympiad_id'] ?? null,
         ];
-
         return response()->json($response);
     }
     

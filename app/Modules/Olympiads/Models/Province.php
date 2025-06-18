@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Province extends Model
 {
-    public $timestamps = false;
 
     protected $table = 'province';
     protected $primaryKey = 'province_id';
+    public $timestamps = false;
 
     protected $fillable = [
         'province_name',
@@ -24,7 +24,7 @@ class Province extends Model
 
     public function department()
     {
-        return $this->belongsTo(Department::class, 'department_id');
+        return $this->belongsTo(Department::class, 'department_id', 'department_id');
     }
 
     public function school()
