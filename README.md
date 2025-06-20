@@ -1,69 +1,74 @@
-# OhSanSi-Backend
+# OhSanSi Backend
 
-Aplicación web de inscripción a las olimpiadas Oh! SanSi
+Aplicación desarrollada en **Laravel 11** para gestionar la inscripción y administración de las Olimpiadas "Oh! SanSi". Provee un API REST para registro de participantes, manejo de pagos y operaciones de importación desde Excel.
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Requisitos
 
-═══════════════════════════════════════════════
-🛠️ Guía para levantar el proyecto desde cero
-═══════════════════════════════════════════════
+- PHP >= 8.2 con extensiones `mbstring`, `curl`, `xml`, `gd`
+- Composer
+- Base de datos PostgreSQL
 
-📁 1. Clona el repositorio
+## Instalación
 
+```bash
+# Clona el repositorio
 git clone https://github.com/andyortz/OhSanSi-Backend.git
 cd OhSanSi-Backend
 
-🔄 Asegúrate de estar en la rama principal: develop
-
-📦 2. Instala dependencias PHP con Composer
-
+# Instala dependencias
 composer install
 
-📝 3. Copia el archivo de entorno
-
+# Copia la configuración de entorno y genera la clave
 cp .env.example .env
-
-🔐 4. Genera la APP KEY de Laravel
-
 php artisan key:generate
 
-🛢️ 5. Configura la base de datos en el archivo .env
+# Configura las credenciales de la base de datos en .env
 
-Previo a la configuración debes crear una nueva base de datos que este VACIA
-y conectarla
+# Ejecuta migraciones y seeders
+php artisan migrate --seed
 
-DB_CONNECTION=pgsql  
- DB_HOST=127.0.0.1  
- DB_PORT=5432  
- DB_DATABASE=nombre_de_base  
- DB_USERNAME=usuario  
- DB_PASSWORD=contraseña
-
-📂 6. Crea el enlace simbólico para archivos públicos
-
+# Crea el enlace a la carpeta de almacenamiento
 php artisan storage:link
 
-📚 7. Ejecuta las migraciones
-
-php artisan migrate
-
-🌱 8. Ejecuta los seeders de datos
-
-php artisan db:seed
-
-🚀 9. Levanta el servidor local
-
+# Inicia el servidor local
 php artisan serve
+```
 
-🌐 Luego abre en tu navegador: http://localhost:8000
+La aplicación estará disponible en `http://localhost:8000`.
 
-🧪 10. Datos mínimos requeridos para pruebas con Postman
+## Estructura de carpetas
 
-Para que las pruebas con Postman funcionen correctamente, asegúrate de tener al menos **un registro válido** en las siguientes tablas:
+```
+app/
+├── Http/Controllers    # Controladores de la API
+├── Models              # Modelos Eloquent
+├── Services            # Lógica de negocio (importación Excel, OCR, registros)
+├── Repositories        # Consultas y operaciones complejas
+├── Imports             # Clases de importación
+└── Providers           # Proveedores de servicios
 
--   olimpiadas
--   olimpistas
--   tutores
--   areas_competencia
--   niveles_categoria
--   pagos
+routes/
+├── api.php             # Endpoints públicos del API
+├── web.php             # Rutas web
+└── console.php         # Comandos Artisan
+
+database/
+├── migrations          # Definición de tablas
+└── seeders             # Carga de datos iniciales
+```
+
+## Explicación técnica
+
+El proyecto sigue el patrón **MVC** de Laravel y amplía la arquitectura con servicios y repositorios:
+
+- **Controladores**: orquestan las solicitudes entrantes y utilizan los servicios para procesar la lógica. Se encuentran en `app/Http/Controllers`.
+- **Servicios**: encapsulan la lógica de negocio como la importación de archivos Excel (`app/Services/Excel`) o el procesamiento de boletas mediante OCR.
+- **Repositorios**: clases en `app/Repositories` para consultas a nivel de base de datos que requieren personalización.
+- **Migraciones y Seeders**: permiten construir la estructura de tablas y poblar datos de referencia (ubicadas en `database/migrations` y `database/seeders`).
+- **Autenticación**: se implementa con Laravel Sanctum para emitir y validar tokens.
+
+Para conocer todas las rutas disponibles consulta `routes/api.php`.
+
+---
+
+¡Listo! Con estos pasos tendrás el backend ejecutándose de manera local.
